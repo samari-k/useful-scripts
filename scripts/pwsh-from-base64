@@ -1,0 +1,8 @@
+#!/bin/pwsh
+
+$EncodedText = $args[0]
+$DecodedText = [System.Text.Encoding]::Unicode.GetString([System.Convert]::FromBase64String($EncodedText))
+$DecodedText
+
+# or use bash:
+# echo '<payload>' | base64 -d

