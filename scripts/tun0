@@ -3,7 +3,7 @@
 IP=$( ip a | grep tun0 | grep inet | tr -s " " | cut -d " " -f3 | cut -d / -f1 )
 
 if [[ $1 == "-c" ]]; then
-  echo -n $IP | xclip -selection -c
+  echo -n $IP | xclip -selection c
   echo "$IP (copied to clipboard)"
 else
   echo "$IP"
